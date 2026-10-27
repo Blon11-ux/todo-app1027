@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import TodoItem from './TodoItem'
 
 test('TODO の文字が表示される', () => {
@@ -32,3 +33,12 @@ test('未完了なら打ち消し線は付かない', () => {
   render(<TodoItem todo={todo} onToggle={() => {}} onDelete={() => {}} />)
   expect(screen.getByText('牛乳を買う')).toHaveStyle({ textDecoration: 'none' })
 })
+test('チェックボックスを押すと onToggle が TODO の id で呼ばれる', async () => {
+  const user = userEvent.setup()
+  const handleToggle = jest.fn()
+  const todo = { id: 'abc', text: '牛乳を買う', done: false }
+  render(<TodoItem todo={todo} onToggle={handleToggle} onDelete={() => {}} />)
+  await user.click(screen.getByRole('checkbox', { name: '牛乳を買う' }))
+  expect(handleToggle).toHaveBeenCalledWith('abc')
+})
+
